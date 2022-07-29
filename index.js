@@ -1,31 +1,23 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+
+// Mongodb
+mongoose
+  .connect(
+    'mongodb+srv://admin:admin@cluster0.cxibak0.mongodb.net/?retryWrites=true&w=majority'
+  )
+  .then(() => console.log('DB ok'))
+  .catch((err) => console.log('DB error', err));
+
 // підключили express
 const app = express();
 
 // читає json формат
 app.use(express.json());
 
-// повернули щось
-app.get('/', (reg, res) => {
-  res.send('Hello World!');
-});
-
-// перевірка логіну
-app.post('/auth/login', (reg, res) => {
-  console.log(reg.body);
-  // генерація токену
-  const token = jwt.sign(
-    {
-      email: reg.body.email,
-      fullName: 'Suprunenko Andrii',
-    },
-    'kukuoskar12345',
-  );
-  res.json({
-    success: true,
-    token,
-  });
+app.post('/auth/register', (reg, res) => {
+  
 });
 
 // порт серверу
