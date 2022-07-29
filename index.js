@@ -1,6 +1,9 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { registerValidation } from './validations/auth.js';
+import { validationResult } from 'express-validator';
+import UserModel from './models/User.js';
 
 // Mongodb
 mongoose
@@ -16,8 +19,14 @@ const app = express();
 // читає json формат
 app.use(express.json());
 
-app.post('/auth/register', (reg, res) => {
-  
+app.post('/auth/register', registerValidation, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors.array());
+  }
+  res.json({
+    success: true,
+  });
 });
 
 // порт серверу
