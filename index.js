@@ -20,6 +20,14 @@ const app = express();
 // читає json формат
 app.use(express.json());
 
+// Authorisation
+app.post('/auth/login', async (req, res) => {
+  try {
+
+  } catch (err) {}
+});
+
+// Registration
 app.post('/auth/register', registerValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -29,20 +37,38 @@ app.post('/auth/register', registerValidation, async (req, res) => {
 
     const password = req.body.password;
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt); //шифруєм пароль
+    const hash = await bcrypt.hash(password, salt); //шифруєм пароль
 
     const doc = new UserModel({
       email: req.body.email,
-      passwordHash,
+      passwordHash: hash,
       fullName: req.body.fullName,
       avatarUrl: req.body.avatarUrl,
     });
 
+    // генеруємо токен з id користувача та ставимо час його дії 14 днів
     const user = await doc.save();
+    const token = jwt.sign(
+      {
+        _id: user._id,
+      },
+      'oskar5647',
+      {
+        expiresIn: '14d',
+      }
+    );
 
-    res.json(user);
+    const { passwordHash, ...userData } = user._doc;
+
+    res.json({
+      ...userData,
+      token,
+    });
   } catch (err) {
-    res.json(err);
+    console.log(err);
+    res.status(500).json({
+      message: 'Не вдалось зареєструватись',
+    });
   }
 });
 
