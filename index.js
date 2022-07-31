@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import { registerValidation } from './validations/auth.js';
 import { validationResult } from 'express-validator';
 import UserModel from './models/User.js';
+import checkAuth from './utils/checkAuth.js';
+import User from './models/User.js';
 
 // Mongodb
 mongoose
@@ -23,8 +25,47 @@ app.use(express.json());
 // Authorisation
 app.post('/auth/login', async (req, res) => {
   try {
+    const user = await UserModel.findOne({ email: req.body.email });
 
-  } catch (err) {}
+    if (!user) {
+      return res.status(404).json({
+        message: 'Не вірний логін',
+      });
+    }
+
+    const isValidPass = await bcrypt.compare(
+      req.body.password,
+      user._doc.passwordHash
+    );
+
+    if (!isValidPass) {
+      return res.status(404).json({
+        message: 'Не вірний логін або пароль',
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        _id: user._id,
+      },
+      'oskar5647',
+      {
+        expiresIn: '14d',
+      }
+    );
+
+    const { passwordHash, ...userData } = user._doc;
+
+    res.json({
+      ...userData,
+      token,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не вдалось авторизуватись',
+    });
+  }
 });
 
 // Registration
@@ -68,6 +109,27 @@ app.post('/auth/register', registerValidation, async (req, res) => {
     console.log(err);
     res.status(500).json({
       message: 'Не вдалось зареєструватись',
+    });
+  }
+});
+
+// Перевірка що ми можемо отримати інформацію про себе
+app.get('/auth/me', checkAuth, async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Користувач не знайдений',
+      });
+    }
+    const { passwordHash, ...userData } = user._doc;
+
+    res.json(userData);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Нема доступу',
     });
   }
 });
