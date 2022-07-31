@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import checkAuth from './utils/checkAuth.js';
-import { registerValidation } from './validations/auth.js';
+import { registerValidation, loginValidation } from './validations.js';
 import * as UserController from './controllers/UserController.js';
 
 // Mongodb
@@ -19,7 +19,7 @@ const app = express();
 app.use(express.json());
 
 // Authorisation
-app.post('/auth/login', UserController.login);
+app.post('/auth/login', loginValidation, UserController.login);
 // Registration
 app.post('/auth/register', registerValidation, UserController.register);
 // Перевірка що ми можемо отримати інформацію про себе
