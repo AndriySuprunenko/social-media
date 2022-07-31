@@ -1,8 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import checkAuth from './utils/checkAuth.js';
-import { registerValidation, loginValidation } from './validations.js';
+import {
+  registerValidation,
+  loginValidation,
+  postCreateValidation,
+} from './validations.js';
 import * as UserController from './controllers/UserController.js';
+import * as PostController from './controllers/PostController.js';
 
 // Mongodb
 mongoose
@@ -24,6 +29,12 @@ app.post('/auth/login', loginValidation, UserController.login);
 app.post('/auth/register', registerValidation, UserController.register);
 // Перевірка що ми можемо отримати інформацію про себе
 app.get('/auth/me', checkAuth, UserController.getMe);
+// Posts
+app.get('/posts', PostController.getAll);
+// app.get('/posts/:id', PostController.getOne);
+app.post('/posts', checkAuth, postCreateValidation, PostController.create);
+// app.delete('/posts', PostController.remove);
+// app.patch('/posts', PostController.update);
 
 // порт серверу
 app.listen(4444, (err) => {

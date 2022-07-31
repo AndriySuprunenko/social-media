@@ -1,13 +1,34 @@
-import PostModel from '../models/Post';
+import PostModel from '../models/Post.js';
+// Дістати всі статті
+export const getAll = async (req, res) => {
+  try {
+    const posts = await PostModel.find();
+    res.json(posts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не вдалось отримати статті',
+    });
+  }
+};
 
-export const create = (res, req) => {
+// Створення статті
+export const create = async (req, res) => {
   try {
     const doc = new PostModel({
       title: req.body.title,
       text: req.body.text,
       imageUrl: req.body.imageUrl,
       tags: req.body.tags,
-      user: req.userId
+      user: req.userId,
     });
-  } catch (error) {}
+
+    const post = await doc.save();
+    res.json(post);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не вдалось створити статтю',
+    });
+  }
 };
