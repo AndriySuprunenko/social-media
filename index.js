@@ -35,6 +35,7 @@ const upload = multer({ storage });
 
 // читає json формат
 app.use(express.json());
+app.use('/uploads/', express.static('uploads'));
 
 // Authorisation
 app.post('/auth/login', loginValidation, UserController.login);
