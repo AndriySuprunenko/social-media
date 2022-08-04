@@ -1,4 +1,5 @@
-import express from 'express';
+import express, { request } from 'express';
+import multer from 'multer';
 import mongoose from 'mongoose';
 import checkAuth from './utils/checkAuth.js';
 import {
@@ -20,6 +21,18 @@ mongoose
 // підключили express
 const app = express();
 
+// Створюємо сховище
+const storage = multer.diskStorage({
+  destination: (_, __, cb) => {
+    cb(null, 'uploads');
+  },
+  filename: (_, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
 // читає json формат
 app.use(express.json());
 
@@ -29,6 +42,14 @@ app.post('/auth/login', loginValidation, UserController.login);
 app.post('/auth/register', registerValidation, UserController.register);
 // Перевірка що ми можемо отримати інформацію про себе
 app.get('/auth/me', checkAuth, UserController.getMe);
+
+// Завантаження зображень
+app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
+  res.json({
+    url: `/uploads/${req.file.originalname}`,
+  });
+});
+
 // Posts
 app.get('/posts', PostController.getAll);
 app.get('/posts/:id', PostController.getOne);
