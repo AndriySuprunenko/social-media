@@ -104,3 +104,31 @@ export const create = async (req, res) => {
     });
   }
 };
+
+// Оновлення статті
+export const update = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    await PostModel.updateOne(
+      {
+        _id: postId,
+      },
+      {
+        title: req.body.title,
+        text: req.body.text,
+        imageUrl: req.body.imageUrl,
+        user: req.body.userId,
+        tags: req.body.tags,
+      }
+    );
+    res.json({
+      succes: true,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не вдалось оновити статтю',
+    });
+  }
+};
