@@ -1,15 +1,13 @@
 import express, { request } from 'express';
 import multer from 'multer';
 import mongoose from 'mongoose';
-import checkAuth from './utils/checkAuth.js';
+import { handleValidationErrors, checkAuth } from './utils/index.js';
 import {
   registerValidation,
   loginValidation,
   postCreateValidation,
 } from './validations.js';
-import * as UserController from './controllers/UserController.js';
-import * as PostController from './controllers/PostController.js';
-import handleValidationErrors from './utils/handleValidationErrors.js';
+import { UserController, PostController } from './controllers/index.js';
 
 // Mongodb
 mongoose
