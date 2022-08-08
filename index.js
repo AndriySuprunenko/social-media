@@ -1,4 +1,5 @@
 import express, { request } from 'express';
+import cors from 'cors';
 import multer from 'multer';
 import mongoose from 'mongoose';
 import { handleValidationErrors, checkAuth } from './utils/index.js';
@@ -31,9 +32,9 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
 // читає json формат
 app.use(express.json());
+app.use(cors());
 app.use('/uploads/', express.static('uploads'));
 
 // Authorisation
