@@ -19,6 +19,6 @@ export const registerValidation = [
 export const postCreateValidation = [
   body('title', 'Введіть заголовок').isLength({ man: 3 }).isString(),
   body('text', 'Введіть текст').isLength({ man: 10 }).isString(),
-  body('tags', 'Неправельний формат(введіть масив)').optional().isString(),
+  body('tags', 'Неправельний формат(введіть масив)').optional().isArray(),
   body('imageUrl', 'Невірна силка на зображення').optional().isString(),
 ];
